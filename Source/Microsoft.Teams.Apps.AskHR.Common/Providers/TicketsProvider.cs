@@ -2,6 +2,9 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
+using Microsoft.WindowsAzure.Storage.Queue;
+using Newtonsoft.Json;
+
 namespace Microsoft.Teams.Apps.AskHR.Common.Providers
 {
     using System;
@@ -20,6 +23,7 @@ namespace Microsoft.Teams.Apps.AskHR.Common.Providers
 
         private readonly Lazy<Task> initializeTask;
         private CloudTable ticketCloudTable;
+        private CloudQueue cloudQueue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TicketsProvider"/> class.
@@ -68,7 +72,22 @@ namespace Microsoft.Teams.Apps.AskHR.Common.Providers
         {
             await this.EnsureInitializedAsync();
             TableOperation addOrUpdateOperation = TableOperation.InsertOrReplace(entity);
+
+            await this.AddTicketEntityIntoQueueAsync(entity);
             return await this.ticketCloudTable.ExecuteAsync(addOrUpdateOperation);
+        }
+
+        /// <summary>
+        /// Store or update ticket entity in table storage
+        /// </summary>
+        /// <param name="entity">entity.</param>
+        /// <returns><see cref="Task"/> that represents configuration entity is saved or updated.</returns>
+        private async Task AddTicketEntityIntoQueueAsync(TicketEntity entity)
+        {
+            await this.EnsureInitializedAsync();
+            var message = JsonConvert.SerializeObject(entity);
+            CloudQueueMessage queueMessage = new CloudQueueMessage(message);
+            await this.cloudQueue.AddMessageAsync(queueMessage);
         }
 
         /// <summary>
@@ -83,6 +102,11 @@ namespace Microsoft.Teams.Apps.AskHR.Common.Providers
             this.ticketCloudTable = cloudTableClient.GetTableReference(StorageInfo.TicketTableName);
 
             await this.ticketCloudTable.CreateIfNotExistsAsync();
+
+            // create new queue storage
+            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+            this.cloudQueue = queueClient.GetQueueReference(StorageInfo.TicketQueuePending);
+            await this.cloudQueue.CreateIfNotExistsAsync();
         }
 
         /// <summary>

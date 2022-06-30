@@ -28,5 +28,6 @@ namespace Microsoft.Teams.Apps.AskHR.Common.Providers
         /// Blob name where Tiles images from configuration app will be saved.
         /// </summary>
         public const string HelpImageBlobContainer = "tileimages";
+        public const string TicketQueuePending = "ticketqueuepending";
     }
 }

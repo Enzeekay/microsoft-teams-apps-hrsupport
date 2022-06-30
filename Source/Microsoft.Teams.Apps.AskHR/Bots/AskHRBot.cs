@@ -79,11 +79,11 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         /// <inheritdoc/>
         public override Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (!this.IsActivityFromExpectedTenant(turnContext))
-            {
-                this.telemetryClient.TrackTrace($"Unexpected tenant id {turnContext.Activity.Conversation.TenantId}", SeverityLevel.Warning);
-                return Task.CompletedTask;
-            }
+            //if (!this.IsActivityFromExpectedTenant(turnContext))
+            //{
+            //    this.telemetryClient.TrackTrace($"Unexpected tenant id {turnContext.Activity.Conversation.TenantId}", SeverityLevel.Warning);
+            //    return Task.CompletedTask;
+            //}
 
             switch (turnContext.Activity.Type)
             {
