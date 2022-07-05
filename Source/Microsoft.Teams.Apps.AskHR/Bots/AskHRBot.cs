@@ -126,7 +126,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                         break;
 
                     default:
-                        await this.OnMessageActivityInPersonalChatAsync(message, turnContext, cancellationToken);
+                        this.telemetryClient.TrackTrace($"Received unexpected conversationType {message.Conversation.ConversationType}", SeverityLevel.Warning);
                         break;
                 }
             }
