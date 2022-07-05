@@ -2,6 +2,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
+using System.Collections;
+
 namespace Microsoft.Teams.Apps.AskHR.Bots
 {
     using System;
@@ -79,11 +81,11 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         /// <inheritdoc/>
         public override Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {
-            //if (!this.IsActivityFromExpectedTenant(turnContext))
-            //{
-            //    this.telemetryClient.TrackTrace($"Unexpected tenant id {turnContext.Activity.Conversation.TenantId}", SeverityLevel.Warning);
-            //    return Task.CompletedTask;
-            //}
+            if (!this.IsActivityFromExpectedTenant(turnContext))
+            {
+                this.telemetryClient.TrackTrace($"Unexpected tenant id {turnContext.Activity.Conversation.TenantId}", SeverityLevel.Warning);
+                return Task.CompletedTask;
+            }
 
             switch (turnContext.Activity.Type)
             {
@@ -105,6 +107,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         {
             try
             {
+
                 var message = turnContext.Activity;
 
                 this.telemetryClient.TrackTrace($"Received message activity");
@@ -123,10 +126,11 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                         break;
 
                     default:
-                        this.telemetryClient.TrackTrace($"Received unexpected conversationType {message.Conversation.ConversationType}", SeverityLevel.Warning);
+                        await this.OnMessageActivityInPersonalChatAsync(message, turnContext, cancellationToken);
                         break;
                 }
             }
+
             catch (Exception ex)
             {
                 this.telemetryClient.TrackTrace($"Error processing message: {ex.Message}", SeverityLevel.Error);
