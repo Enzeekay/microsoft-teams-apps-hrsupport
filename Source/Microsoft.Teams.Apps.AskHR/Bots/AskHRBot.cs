@@ -87,6 +87,8 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                 return Task.CompletedTask;
             }
 
+            this.telemetryClient.TrackTrace($"Activity Type: {turnContext.Activity.Type}");
+
             switch (turnContext.Activity.Type)
             {
                 case ActivityTypes.Message:
@@ -111,7 +113,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                 var message = turnContext.Activity;
 
                 this.telemetryClient.TrackTrace($"Received message activity");
-                this.telemetryClient.TrackTrace($"from: {message.From?.Id}, conversation: {message.Conversation.Id}, replyToId: {message.ReplyToId}");
+                this.telemetryClient.TrackTrace($"from: {message.From?.Id}, conversation: {message.Conversation.Id}, conversationType: {message.Conversation.ConversationType}, replyToId: {message.ReplyToId}");
 
                 await this.SendTypingIndicatorAsync(turnContext);
 
@@ -222,6 +224,8 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
 
             string text = (message.Text ?? string.Empty).Trim().ToLower();
 
+            this.telemetryClient.TrackTrace($"OnMessageActivityInPersonalChatAsync: message text: {text}");
+
             if (text.Equals(Resource.BotCommandAskAnExpert, StringComparison.CurrentCultureIgnoreCase) ||
                 text.Equals(Constants.AskAnExpert, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -304,6 +308,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
 
             string text = (message.Text ?? string.Empty).Trim();
 
+            this.telemetryClient.TrackTrace($"OnAdaptiveCardSubmitInPersonalChatAsync: message text: {text}");
             switch (text)
             {
                 case Constants.AskAnExpert:
