@@ -73,7 +73,12 @@ namespace Microsoft.Teams.Apps.AskHR.Common.Providers
             await this.EnsureInitializedAsync();
             TableOperation addOrUpdateOperation = TableOperation.InsertOrReplace(entity);
 
-            await this.AddTicketEntityIntoQueueAsync(entity);
+            // case add new
+            if (string.IsNullOrEmpty(entity.SmeThreadConversationId))
+            {
+                await this.AddTicketEntityIntoQueueAsync(entity);
+            }
+
             return await this.ticketCloudTable.ExecuteAsync(addOrUpdateOperation);
         }
 
