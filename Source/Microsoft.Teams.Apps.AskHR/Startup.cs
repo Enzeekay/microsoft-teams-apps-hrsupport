@@ -2,6 +2,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
+using Microsoft.Teams.Apps.AskHR.DynamicService;
+
 namespace Microsoft.Teams.Apps.AskHR
 {
     using System.Collections.Generic;
@@ -57,6 +59,7 @@ namespace Microsoft.Teams.Apps.AskHR
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSingleton<Common.Providers.IConfigurationProvider>(new Common.Providers.ConfigurationProvider(storageConnectionString));
             services.AddHttpClient();
+            services.AddTransient<ITicketService, TicketService>();
             services.AddSingleton<ICredentialProvider, ConfigurationCredentialProvider>();
             services.AddSingleton<ITicketsProvider>(new TicketsProvider(storageConnectionString));
             services.AddSingleton<IHelpDataProvider>(new HelpDataProvider(storageConnectionString));
@@ -71,7 +74,8 @@ namespace Microsoft.Teams.Apps.AskHR
                 this.Configuration["AppBaseUri"],
                 this.Configuration["TenantId"],
                 provider.GetRequiredService<MicrosoftAppCredentials>(),
-                provider.GetRequiredService<ITicketsProvider>()));
+                provider.GetRequiredService<ITicketsProvider>(),
+                provider.GetRequiredService<ITicketService>()));
             services.AddApplicationInsightsTelemetry();
             services.AddSingleton<IQnAMakerFactory, QnAMakerFactory>();
             services.AddSingleton<ISearchService, SearchService>();
@@ -102,6 +106,8 @@ namespace Microsoft.Teams.Apps.AskHR
                 new ConfigurationManager<OpenIdConnectConfiguration>(
                     $"https://login.microsoftonline.com/{this.Configuration["TenantId"]}/.well-known/openid-configuration",
                 new OpenIdConnectConfigurationRetriever()));
+
+            services.AddSingleton<ServiceConfig>(new ServiceConfig(this.Configuration["DynamicConnection"]));
 
             services.AddSingleton<IAuthManager>((provider) => new AuthManager(
                 provider.GetRequiredService<IConfigurationManager<OpenIdConnectConfiguration>>(),

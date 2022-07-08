@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Collections;
+using Microsoft.Teams.Apps.AskHR.DynamicService;
 
 namespace Microsoft.Teams.Apps.AskHR.Bots
 {
@@ -43,6 +44,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         private readonly string appBaseUri;
         private readonly MicrosoftAppCredentials microsoftAppCredentials;
         private readonly ITicketsProvider ticketsProvider;
+        private readonly ITicketService ticketService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AskHRBot"/> class.
@@ -65,7 +67,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             string appBaseUri,
             string expectedTenantId,
             MicrosoftAppCredentials microsoftAppCredentials,
-            ITicketsProvider ticketsProvider)
+            ITicketsProvider ticketsProvider, ITicketService ticketService)
         {
             this.telemetryClient = telemetryClient;
             this.configurationProvider = configurationProvider;
@@ -75,6 +77,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             this.appBaseUri = appBaseUri;
             this.microsoftAppCredentials = microsoftAppCredentials;
             this.ticketsProvider = ticketsProvider;
+            this.ticketService = ticketService;
             this.expectedTenantId = expectedTenantId;
         }
 
@@ -215,6 +218,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         // Handle message activity in 1:1 chat
         private async Task OnMessageActivityInPersonalChatAsync(IMessageActivity message, ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
+
             if (!string.IsNullOrEmpty(message.ReplyToId) && (message.Value != null) && ((JObject)message.Value).HasValues)
             {
                 this.telemetryClient.TrackTrace("Card submit in 1:1 chat");
@@ -250,20 +254,9 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                      || text.Equals(Constants.CheckMyTicket, StringComparison.InvariantCultureIgnoreCase))
             {
                 this.telemetryClient.TrackTrace("Sending user ask ticket status");
-                var tickets = new List<TicketModel>
-                {
-                    new TicketModel
-                    {
-                        CaseNumber = "090232-ANDAD",
-                        TicketTitle = "Can I claim insurrances"
-                    },
-                    new TicketModel
-                    {
-                        CaseNumber = "090232-AND2233",
-                        TicketTitle = "Can I claim leave"
-                    }
-                };
 
+                var userDetail = await this.GetUserDetailsInPersonalChatAsync(turnContext, cancellationToken);
+                var tickets = await this.ticketService.GetMyTicketAsync(userDetail.UserPrincipalName);
                 await turnContext.SendActivityAsync(MessageFactory.Attachment(CheckTicketStatusCard.GetCard(tickets)), cancellationToken);
             }
             else
@@ -327,11 +320,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             Attachment userCard = null;         // Acknowledgement to the user
             TicketEntity newTicket = null;      // New ticket
 
-            // TODO
-            //var askAnExpertPayload = ((JObject)message.Value).ToObject<AskAnExpertCardPayload>();
             string text = (message.Text ?? string.Empty).Trim();
-            //
-
             this.telemetryClient.TrackTrace($"OnAdaptiveCardSubmitInPersonalChatAsync: message text: {text}");
             switch (text)
             {
@@ -339,8 +328,9 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                     {
                         this.telemetryClient.TrackTrace("Sending user get ticket");
 
-                        var responseCardPayload = ((JObject)message.Value).ToObject<ResponseCardPayload>();
-                        await turnContext.SendActivityAsync(MessageFactory.Attachment(CheckTicketStatusCard.GetCard(new List<TicketModel>())));
+                        var userDetail = await this.GetUserDetailsInPersonalChatAsync(turnContext, cancellationToken);
+                        var tickets = await this.ticketService.GetMyTicketAsync(userDetail.UserPrincipalName);
+                        await turnContext.SendActivityAsync(MessageFactory.Attachment(CheckTicketStatusCard.GetCard(tickets)));
                         break;
                     }
 

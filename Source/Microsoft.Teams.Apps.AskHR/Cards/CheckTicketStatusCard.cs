@@ -48,7 +48,7 @@ namespace Microsoft.Teams.Apps.AskHR.Cards
             {
                 factList.Add(new AdaptiveFact
                 {
-                    Title = Resource.BotCommandAskAnExpert,
+                    Title = Resource.TicketCaseNumber,
                     Value = ticketModel.CaseNumber,
                 });
 
