@@ -58,6 +58,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         /// <param name="expectedTenantId">Tenant id</param>
         /// <param name="microsoftAppCredentials">Microsoft app credentials to use</param>
         /// <param name="ticketsProvider">The tickets provider.</param>
+        /// <param name="ticketService">ticket service</param>
         public AskHRBot(
             TelemetryClient telemetryClient,
             IConfigurationProvider configurationProvider,
@@ -67,7 +68,8 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             string appBaseUri,
             string expectedTenantId,
             MicrosoftAppCredentials microsoftAppCredentials,
-            ITicketsProvider ticketsProvider, ITicketService ticketService)
+            ITicketsProvider ticketsProvider,
+            ITicketService ticketService)
         {
             this.telemetryClient = telemetryClient;
             this.configurationProvider = configurationProvider;
