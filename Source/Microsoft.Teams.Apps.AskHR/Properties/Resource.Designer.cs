@@ -19,7 +19,7 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resource {
@@ -129,6 +129,15 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         public static string askHRAppDescription {
             get {
                 return ResourceManager.GetString("askHRAppDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to my ticket.
+        /// </summary>
+        public static string AskTicketStatus {
+            get {
+                return ResourceManager.GetString("AskTicketStatus", resourceCulture);
             }
         }
         
@@ -430,6 +439,15 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your ticket list.
+        /// </summary>
+        public static string ListTicketMessage {
+            get {
+                return ResourceManager.GetString("ListTicketMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Login.
         /// </summary>
         public static string LoginButtonText {
@@ -462,6 +480,15 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         public static string MandatoryTitleFieldText {
             get {
                 return ResourceManager.GetString("MandatoryTitleFieldText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check My Ticket.
+        /// </summary>
+        public static string MyTicketButtonText {
+            get {
+                return ResourceManager.GetString("MyTicketButtonText", resourceCulture);
             }
         }
         
@@ -903,6 +930,42 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         public static string ThankYouTextContent {
             get {
                 return ResourceManager.GetString("ThankYouTextContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Case number.
+        /// </summary>
+        public static string TicketCaseNumber {
+            get {
+                return ResourceManager.GetString("TicketCaseNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Description.
+        /// </summary>
+        public static string TicketDescription {
+            get {
+                return ResourceManager.GetString("TicketDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status.
+        /// </summary>
+        public static string TicketStatus {
+            get {
+                return ResourceManager.GetString("TicketStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Title.
+        /// </summary>
+        public static string TicketTitle {
+            get {
+                return ResourceManager.GetString("TicketTitle", resourceCulture);
             }
         }
         

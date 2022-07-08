@@ -66,6 +66,19 @@ namespace Microsoft.Teams.Apps.AskHR.Cards
                                 Text = Constants.ShareFeedback,
                             }
                         }
+                    },
+                    new AdaptiveSubmitAction
+                    {
+                        Title = Resource.MyTicketButtonText,
+                        Data = new ResponseCardPayload
+                        {
+                            MsTeams = new CardAction
+                            {
+                                Type = ActionTypes.MessageBack,
+                                DisplayText = Resource.AskTicketStatus,
+                                Text = Constants.MyTicket,
+                            }
+                        }
                     }
                 }
             };

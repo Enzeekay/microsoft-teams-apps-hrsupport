@@ -38,5 +38,8 @@ namespace Microsoft.Teams.Apps.AskHR.Common
         /// Text associated with share feedback command.
         /// </summary>
         public const string ShareFeedbackSubmitText = "ShareFeedback";
+
+        public const string MyTicket = "my ticket";
+        public const string CheckMyTicket = "check my ticket";
     }
 }

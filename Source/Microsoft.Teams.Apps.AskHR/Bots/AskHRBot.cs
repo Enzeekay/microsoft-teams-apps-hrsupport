@@ -245,6 +245,27 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                 var userTourCards = TourCarousel.GetUserTourCards(this.appBaseUri);
                 await turnContext.SendActivityAsync(MessageFactory.Carousel(userTourCards));
             }
+            else if (text.Equals(Resource.AskTicketStatus, StringComparison.CurrentCultureIgnoreCase)
+                     || text.Equals(Constants.MyTicket, StringComparison.InvariantCultureIgnoreCase)
+                     || text.Equals(Constants.CheckMyTicket, StringComparison.InvariantCultureIgnoreCase))
+            {
+                this.telemetryClient.TrackTrace("Sending user ask ticket status");
+                var tickets = new List<TicketModel>
+                {
+                    new TicketModel
+                    {
+                        CaseNumber = "090232-ANDAD",
+                        TicketTitle = "Can I claim insurrances"
+                    },
+                    new TicketModel
+                    {
+                        CaseNumber = "090232-AND2233",
+                        TicketTitle = "Can I claim leave"
+                    }
+                };
+
+                await turnContext.SendActivityAsync(MessageFactory.Attachment(CheckTicketStatusCard.GetCard(tickets)), cancellationToken);
+            }
             else
             {
                 this.telemetryClient.TrackTrace("Sending input to QnAMaker");
@@ -306,11 +327,23 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             Attachment userCard = null;         // Acknowledgement to the user
             TicketEntity newTicket = null;      // New ticket
 
+            // TODO
+            //var askAnExpertPayload = ((JObject)message.Value).ToObject<AskAnExpertCardPayload>();
             string text = (message.Text ?? string.Empty).Trim();
+            //
 
             this.telemetryClient.TrackTrace($"OnAdaptiveCardSubmitInPersonalChatAsync: message text: {text}");
             switch (text)
             {
+                case Constants.MyTicket:
+                    {
+                        this.telemetryClient.TrackTrace("Sending user get ticket");
+
+                        var responseCardPayload = ((JObject)message.Value).ToObject<ResponseCardPayload>();
+                        await turnContext.SendActivityAsync(MessageFactory.Attachment(CheckTicketStatusCard.GetCard(new List<TicketModel>())));
+                        break;
+                    }
+
                 case Constants.AskAnExpert:
                     {
                         this.telemetryClient.TrackTrace("Sending user ask an expert card (from answer)");
@@ -332,9 +365,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                 case Constants.AskAnExpertSubmitText:
                     {
                         this.telemetryClient.TrackTrace($"Received question for expert");
-
                         var askAnExpertPayload = ((JObject)message.Value).ToObject<AskAnExpertCardPayload>();
-
                         // Validate required fields
                         if (string.IsNullOrWhiteSpace(askAnExpertPayload.Title))
                         {

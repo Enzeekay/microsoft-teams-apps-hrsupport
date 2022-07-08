@@ -540,4 +540,22 @@ This needs to be match with manifest's command "Share feedback" in translated js
     <comment>Bot command Take a tour.
 This needs to be match with manifest's command "Take a tour" in translated json file.</comment>
   </data>
+  <data name="AskTicketStatus" xml:space="preserve">
+    <value>Ask ticket status</value>
+  </data>
+  <data name="ListTicketMessage" xml:space="preserve">
+    <value>Your ticket list</value>
+  </data>
+  <data name="TicketCaseNumber" xml:space="preserve">
+    <value>Case number</value>
+  </data>
+  <data name="TicketDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="TicketStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="TicketTitle" xml:space="preserve">
+    <value>Title</value>
+  </data>
 </root>
