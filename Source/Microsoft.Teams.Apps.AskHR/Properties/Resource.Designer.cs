@@ -547,7 +547,7 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You have not ticket yet.
+        ///   Looks up a localized string similar to You have no ticket yet.
         /// </summary>
         public static string NoTicketFound {
             get {
