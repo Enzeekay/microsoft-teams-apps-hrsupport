@@ -23,5 +23,6 @@
         public string CustomerName { get; set; }
 
         public string TicketStatus { get; set; }
+        public string CreatedDate { get; set; }
     }
 }

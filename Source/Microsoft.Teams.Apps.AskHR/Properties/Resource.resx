@@ -561,4 +561,7 @@ This needs to be match with manifest's command "Take a tour" in translated json 
   <data name="MyTicketButtonText" xml:space="preserve">
     <value>Check My Ticket</value>
   </data>
+  <data name="MyTicketCreatedDate" xml:space="preserve">
+    <value>Created Date</value>
+  </data>
 </root>

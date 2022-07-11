@@ -493,6 +493,15 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Created Date.
+        /// </summary>
+        public static string MyTicketCreatedDate {
+            get {
+                return ResourceManager.GetString("MyTicketCreatedDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Needs Improvement.
         /// </summary>
         public static string NeedsImprovementRatingText {

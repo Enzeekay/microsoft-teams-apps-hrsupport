@@ -26,12 +26,17 @@ namespace Microsoft.Teams.Apps.AskHR.Cards
                         Weight = AdaptiveTextWeight.Bolder,
                         HorizontalAlignment = textAlignment
                     },
-                    new AdaptiveFactSet
-                    {
-                        Facts = BuildFactSet(tickets)
-                    }
-                },
+                }
             };
+
+            foreach (var ticketModel in tickets)
+            {
+                adaptiveCard.Body.Add(new AdaptiveFactSet
+                {
+                    Facts = BuildFactSet(ticketModel),
+                    Separator = true
+                });
+            }
 
             return new Attachment
             {
@@ -40,36 +45,36 @@ namespace Microsoft.Teams.Apps.AskHR.Cards
             };
         }
 
-        private static List<AdaptiveFact> BuildFactSet(List<TicketModel> tickets)
+        private static List<AdaptiveFact> BuildFactSet(TicketModel ticketModel)
         {
-            List<AdaptiveFact> factList = new List<AdaptiveFact>();
-
-            foreach (var ticketModel in tickets)
+            List<AdaptiveFact> factList = new List<AdaptiveFact>
             {
-                factList.Add(new AdaptiveFact
+                new AdaptiveFact
                 {
                     Title = Resource.TicketCaseNumber,
                     Value = ticketModel.CaseNumber,
-                });
-
-                factList.Add(new AdaptiveFact
+                },
+                new AdaptiveFact
                 {
                     Title = Resource.TicketTitle,
                     Value = ticketModel.TicketTitle,
-                });
-
-                factList.Add(new AdaptiveFact
+                },
+                new AdaptiveFact
                 {
                     Title = Resource.TicketDescription,
                     Value = ticketModel.Description,
-                });
-
-                factList.Add(new AdaptiveFact
+                },
+                new AdaptiveFact
                 {
                     Title = Resource.TicketStatus,
                     Value = ticketModel.TicketStatus,
-                });
-            }
+                },
+                new AdaptiveFact
+                {
+                    Title = Resource.MyTicketCreatedDate,
+                    Value = ticketModel.CreatedDate,
+                }
+            };
 
             return factList;
         }
