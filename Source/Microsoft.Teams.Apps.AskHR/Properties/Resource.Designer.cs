@@ -547,6 +547,15 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You have not ticket yet.
+        /// </summary>
+        public static string NoTicketFound {
+            get {
+                return ResourceManager.GetString("NoTicketFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to I&apos;ve shared your question with the related experts. They&apos;ll respond to you directly with a chat message..
         /// </summary>
         public static string NotificationCardContent {

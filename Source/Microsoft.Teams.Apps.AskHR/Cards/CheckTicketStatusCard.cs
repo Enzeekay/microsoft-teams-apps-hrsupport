@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using AdaptiveCards;
 using Microsoft.Bot.Schema;
 using Microsoft.Teams.Apps.AskHR.Models;
@@ -25,16 +26,27 @@ namespace Microsoft.Teams.Apps.AskHR.Cards
                         Wrap = true,
                         Weight = AdaptiveTextWeight.Bolder,
                         HorizontalAlignment = textAlignment
-                    },
+                    }
                 }
             };
 
-            foreach (var ticketModel in tickets)
+            if (tickets.Any())
             {
-                adaptiveCard.Body.Add(new AdaptiveFactSet
+                foreach (var ticketModel in tickets)
                 {
-                    Facts = BuildFactSet(ticketModel),
-                    Separator = true
+                    adaptiveCard.Body.Add(new AdaptiveFactSet
+                    {
+                        Facts = BuildFactSet(ticketModel),
+                        Separator = true
+                    });
+                }
+            }
+            else
+            {
+                adaptiveCard.Body.Add(new AdaptiveTextBlock
+                {
+                    Text = Resource.NoTicketFound,
+                    HorizontalAlignment = textAlignment
                 });
             }
 
