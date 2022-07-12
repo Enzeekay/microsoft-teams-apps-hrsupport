@@ -50,6 +50,7 @@ namespace Microsoft.Teams.Apps.AskHR.DynamicService
 
                     var getMyTickets = await svc.GetAsync("incidents?" +
                                                           "$select=ticketnumber,title,description,statuscode,createdon&" +
+                                                          "$orderby=createdon desc&" +
                                                           $"$filter=_primarycontactid_value eq {contactId}", formattedValueHeaders);
 
                     if (getMyTickets != null && getMyTickets["value"] != null && getMyTickets["value"].Children().Any())
