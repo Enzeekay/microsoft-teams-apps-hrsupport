@@ -70,7 +70,7 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Send question.
+        ///   Looks up a localized string similar to Submit a ticket.
         /// </summary>
         public static string AskAnExpertButtonText {
             get {
@@ -79,7 +79,7 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ask an expert.
+        ///   Looks up a localized string similar to submit a ticket.
         /// </summary>
         public static string AskAnExpertDisplayText {
             get {
@@ -97,7 +97,7 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An expert from human resources will respond directly with a chat message..
+        ///   Looks up a localized string similar to Please fill out the form below to create ticket..
         /// </summary>
         public static string AskAnExpertSubheaderText {
             get {
@@ -106,7 +106,7 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ask an expert.
+        ///   Looks up a localized string similar to Create a ticket.
         /// </summary>
         public static string AskAnExpertText1 {
             get {
@@ -997,7 +997,7 @@ namespace Microsoft.Teams.Apps.AskHR.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Question (required).
+        ///   Looks up a localized string similar to Title (required).
         /// </summary>
         public static string TitleRequiredText {
             get {

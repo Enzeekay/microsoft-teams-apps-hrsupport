@@ -22,7 +22,7 @@ namespace Microsoft.Teams.Apps.AskHR.Common
         /// <summary>
         /// AskAnExpert - text that renders the ask an expert card.
         /// </summary>
-        public const string AskAnExpert = "ask an expert";
+        public const string AskAnExpert = "submit a ticket";
 
         /// <summary>
         /// Text associated with ask an expert command.

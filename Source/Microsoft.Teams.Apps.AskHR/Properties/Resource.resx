@@ -122,7 +122,7 @@
     <comment>Ask an expert placeholder text.</comment>
   </data>
   <data name="AskAnExpertText1" xml:space="preserve">
-    <value>Ask an expert</value>
+    <value>Create a ticket</value>
     <comment>Title of the ask an expert card.</comment>
   </data>
   <data name="AskAnExpertText2" xml:space="preserve">
@@ -166,7 +166,7 @@
     <comment>Status one of the available fact set in notification cards.</comment>
   </data>
   <data name="AskAnExpertButtonText" xml:space="preserve">
-    <value>Send question</value>
+    <value>Submit a ticket</value>
     <comment>Action button which invokes ask an expert show card.</comment>
   </data>
   <data name="ThankYouTextContent" xml:space="preserve">
@@ -302,7 +302,7 @@ My key features:
     <comment>Title text of share feedback user carousel card.</comment>
   </data>
   <data name="AskAnExpertDisplayText" xml:space="preserve">
-    <value>Ask an expert</value>
+    <value>submit a ticket</value>
     <comment>Ask an expert display text: text sent to the bot when ask an expert button is clicked.</comment>
   </data>
   <data name="ShareFeedbackDisplayText" xml:space="preserve">
@@ -425,7 +425,7 @@ My key features:
     <comment>This value represents the SME Ticket in the Unassigned status</comment>
   </data>
   <data name="AskAnExpertSubheaderText" xml:space="preserve">
-    <value>An expert from human resources will respond directly with a chat message.</value>
+    <value>Please fill out the form below to create ticket.</value>
     <comment>Ask en expert card subtitle text:lets the user know that SME team member can directly chat with the requester.</comment>
   </data>
   <data name="DescriptionFact" xml:space="preserve">
@@ -461,7 +461,7 @@ My key features:
     <comment>Title fact is used to show the title entered by the user for his inquiry.</comment>
   </data>
   <data name="TitleRequiredText" xml:space="preserve">
-    <value>Question (required)</value>
+    <value>Title (required)</value>
     <comment>Title(Required): label of the title text box.</comment>
   </data>
   <data name="NotHelpfulRatingText" xml:space="preserve">
