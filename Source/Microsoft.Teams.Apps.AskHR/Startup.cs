@@ -60,6 +60,7 @@ namespace Microsoft.Teams.Apps.AskHR
             services.AddSingleton<Common.Providers.IConfigurationProvider>(new Common.Providers.ConfigurationProvider(storageConnectionString));
             services.AddHttpClient();
             services.AddTransient<ITicketService, TicketService>();
+            services.AddTransient<IUserService, UserService>();
             services.AddSingleton<ICredentialProvider, ConfigurationCredentialProvider>();
             services.AddSingleton<ITicketsProvider>(new TicketsProvider(storageConnectionString));
             services.AddSingleton<IHelpDataProvider>(new HelpDataProvider(storageConnectionString));
@@ -75,7 +76,8 @@ namespace Microsoft.Teams.Apps.AskHR
                 this.Configuration["TenantId"],
                 provider.GetRequiredService<MicrosoftAppCredentials>(),
                 provider.GetRequiredService<ITicketsProvider>(),
-                provider.GetRequiredService<ITicketService>()));
+                provider.GetRequiredService<ITicketService>(),
+                provider.GetRequiredService<IUserService>()));
             services.AddApplicationInsightsTelemetry();
             services.AddSingleton<IQnAMakerFactory, QnAMakerFactory>();
             services.AddSingleton<ISearchService, SearchService>();

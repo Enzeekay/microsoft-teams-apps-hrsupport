@@ -45,6 +45,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         private readonly MicrosoftAppCredentials microsoftAppCredentials;
         private readonly ITicketsProvider ticketsProvider;
         private readonly ITicketService ticketService;
+        private readonly IUserService _userService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AskHRBot"/> class.
@@ -59,6 +60,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         /// <param name="microsoftAppCredentials">Microsoft app credentials to use</param>
         /// <param name="ticketsProvider">The tickets provider.</param>
         /// <param name="ticketService">ticket service</param>
+        /// <param name="userService">user Service</param>
         public AskHRBot(
             TelemetryClient telemetryClient,
             IConfigurationProvider configurationProvider,
@@ -69,7 +71,8 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             string expectedTenantId,
             MicrosoftAppCredentials microsoftAppCredentials,
             ITicketsProvider ticketsProvider,
-            ITicketService ticketService)
+            ITicketService ticketService,
+            IUserService userService)
         {
             this.telemetryClient = telemetryClient;
             this.configurationProvider = configurationProvider;
@@ -80,12 +83,24 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             this.microsoftAppCredentials = microsoftAppCredentials;
             this.ticketsProvider = ticketsProvider;
             this.ticketService = ticketService;
+            this._userService = userService;
             this.expectedTenantId = expectedTenantId;
         }
 
         /// <inheritdoc/>
         public override Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (string.IsNullOrEmpty(turnContext.Activity.Conversation.TenantId))
+            {
+                turnContext.Activity.Conversation.TenantId = this.expectedTenantId;
+            }
+
+            var userDetail = this._userService.GetUserDetail("PSVdev@atomfrontier.com").Result;
+            if (userDetail != null)
+            {
+                this.telemetryClient.TrackTrace($"userDetail: {userDetail.JsonSerializeObject()}");
+            }
+
             if (!this.IsActivityFromExpectedTenant(turnContext))
             {
                 this.telemetryClient.TrackTrace($"Unexpected tenant id {turnContext.Activity.Conversation.TenantId}", SeverityLevel.Warning);
@@ -121,6 +136,14 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                 this.telemetryClient.TrackTrace($"from: {message.From?.Id}, conversation: {message.Conversation.Id}, conversationType: {message.Conversation.ConversationType}, replyToId: {message.ReplyToId}");
 
                 await this.SendTypingIndicatorAsync(turnContext);
+
+                // TODO to remove to deploy
+                if (string.IsNullOrEmpty(message.Conversation.ConversationType))
+                {
+                    message.Conversation.ConversationType = "personal";
+                }
+
+                // end to to
 
                 switch (message.Conversation.ConversationType)
                 {
@@ -220,6 +243,13 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         // Handle message activity in 1:1 chat
         private async Task OnMessageActivityInPersonalChatAsync(IMessageActivity message, ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
+            // TODO to remove after deploy
+            if (string.IsNullOrEmpty(message.ReplyToId))
+            {
+                message.ReplyToId = Guid.NewGuid().ToString();
+            }
+
+            // End TODO
 
             if (!string.IsNullOrEmpty(message.ReplyToId) && (message.Value != null) && ((JObject)message.Value).HasValues)
             {
@@ -322,7 +352,11 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             Attachment userCard = null;         // Acknowledgement to the user
             TicketEntity newTicket = null;      // New ticket
 
-            string text = (message.Text ?? string.Empty).Trim();
+            // TODO
+            var askAnExpertPayload = ((JObject)message.Value).ToObject<AskAnExpertCardPayload>();
+            string text = (message.Text ?? askAnExpertPayload.MsTeams.Text).Trim();
+            //
+
             this.telemetryClient.TrackTrace($"OnAdaptiveCardSubmitInPersonalChatAsync: message text: {text}");
             switch (text)
             {
@@ -331,6 +365,8 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                         this.telemetryClient.TrackTrace("Sending user get ticket");
 
                         var userDetail = await this.GetUserDetailsInPersonalChatAsync(turnContext, cancellationToken);
+                        this.telemetryClient.TrackTrace($"user detail info: {userDetail.JsonSerializeObject()}");
+
                         var tickets = await this.ticketService.GetMyTicketAsync(userDetail.UserPrincipalName);
                         await turnContext.SendActivityAsync(MessageFactory.Attachment(CheckTicketStatusCard.GetCard(tickets)));
                         break;
@@ -357,7 +393,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                 case Constants.AskAnExpertSubmitText:
                     {
                         this.telemetryClient.TrackTrace($"Received question for expert");
-                        var askAnExpertPayload = ((JObject)message.Value).ToObject<AskAnExpertCardPayload>();
+
                         // Validate required fields
                         if (string.IsNullOrWhiteSpace(askAnExpertPayload.Title))
                         {
@@ -668,6 +704,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
           CancellationToken cancellationToken)
         {
             var members = await ((BotFrameworkAdapter)turnContext.Adapter).GetConversationMembersAsync(turnContext, cancellationToken);
+            this.telemetryClient.TrackTrace($"GetUserDetailsInPersonalChatAsync, {JsonConvert.SerializeObject(members[0])}");
             return JsonConvert.DeserializeObject<TeamsChannelAccount>(JsonConvert.SerializeObject(members[0]));
         }
 
