@@ -95,11 +95,11 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                 turnContext.Activity.Conversation.TenantId = this.expectedTenantId;
             }
 
-            var userDetail = this._userService.GetUserDetail("PSVdev@atomfrontier.com").Result;
-            if (userDetail != null)
-            {
-                this.telemetryClient.TrackTrace($"userDetail: {userDetail.JsonSerializeObject()}");
-            }
+            // var userDetail = this._userService.GetUserDetail("PSVdev@atomfrontier.com").Result;
+            // if (userDetail != null)
+            // {
+            //      this.telemetryClient.TrackTrace($"userDetail: {userDetail.JsonSerializeObject()}");
+            // }
 
             if (!this.IsActivityFromExpectedTenant(turnContext))
             {
@@ -643,7 +643,20 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
 
             try
             {
-                var kbId = await this.configurationProvider.GetSavedEntityDetailAsync(ConfigurationEntityTypes.KnowledgeBaseId);
+                var getKbIds = await this.configurationProvider.GetSavedEntityDetailAsync(ConfigurationEntityTypes.KnowledgeBaseId);
+                if (string.IsNullOrEmpty(getKbIds))
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(UnrecognizedInputCard.GetCard(message, Resource.ConfigurationIssueMessage)));
+                    this.telemetryClient.TrackTrace("Knowledge base ID was not found in configuration table", SeverityLevel.Warning);
+                    return null;
+                }
+
+                var userDetail = await this.GetUserDetailsInPersonalChatAsync(turnContext, cancellationToken);
+                var kbModels = getKbIds.JsonDeserializeObject<List<KnowledgeBaseModel>>();
+                var userInfoModel = this._userService.GetUserDetail(userDetail.Email).Result;
+                var kbId = this.GetKbId(kbModels, userInfoModel?.OfficeLocation);
+
+                this.telemetryClient.TrackTrace($"user location: {userInfoModel?.OfficeLocation}, KbId: {kbId}");
                 if (string.IsNullOrEmpty(kbId))
                 {
                     await turnContext.SendActivityAsync(MessageFactory.Attachment(UnrecognizedInputCard.GetCard(message, Resource.ConfigurationIssueMessage)));
@@ -792,6 +805,19 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         private bool IsActivityFromExpectedTenant(ITurnContext turnContext)
         {
             return turnContext.Activity.Conversation.TenantId == this.expectedTenantId;
+        }
+
+        private string GetKbId(List<KnowledgeBaseModel> knowledgeBaseModels, string location)
+        {
+            var kbId = string.Empty;
+            if (string.IsNullOrEmpty(location))
+            {
+                location = "Hanoi";
+            }
+
+            if (!knowledgeBaseModels.Any()) return kbId;
+            var findKbId = knowledgeBaseModels.FirstOrDefault(t => t.Location == location);
+            return findKbId != null ? findKbId.KbId : kbId;
         }
     }
 }
