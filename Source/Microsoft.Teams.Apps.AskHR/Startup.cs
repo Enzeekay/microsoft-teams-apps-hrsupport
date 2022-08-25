@@ -110,6 +110,7 @@ namespace Microsoft.Teams.Apps.AskHR
                 new OpenIdConnectConfigurationRetriever()));
 
             services.AddSingleton<ServiceConfig>(new ServiceConfig(this.Configuration["DynamicConnection"]));
+            services.AddSingleton<UserInfoApiSetting>(new UserInfoApiSetting(this.Configuration["UserInfoSetting:EndPoint"], this.Configuration["UserInfoSetting:ClientSecret"]));
 
             services.AddSingleton<IAuthManager>((provider) => new AuthManager(
                 provider.GetRequiredService<IConfigurationManager<OpenIdConnectConfiguration>>(),

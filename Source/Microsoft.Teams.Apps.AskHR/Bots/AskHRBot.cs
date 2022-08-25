@@ -95,11 +95,11 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                 turnContext.Activity.Conversation.TenantId = this.expectedTenantId;
             }
 
-            // var userDetail = this._userService.GetUserDetail("PSVdev@atomfrontier.com").Result;
-            // if (userDetail != null)
-            // {
-            //      this.telemetryClient.TrackTrace($"userDetail: {userDetail.JsonSerializeObject()}");
-            // }
+            //var userDetail = this._userService.GetUserDetail("PSVdev@atomfrontier.com").Result;
+            //if (userDetail != null)
+            //{
+            //    this.telemetryClient.TrackTrace($"userDetail: {userDetail.JsonSerializeObject()}");
+            //}
 
             if (!this.IsActivityFromExpectedTenant(turnContext))
             {
@@ -138,10 +138,10 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                 await this.SendTypingIndicatorAsync(turnContext);
 
                 // TODO to remove to deploy
-                if (string.IsNullOrEmpty(message.Conversation.ConversationType))
-                {
-                    message.Conversation.ConversationType = "personal";
-                }
+                //if (string.IsNullOrEmpty(message.Conversation.ConversationType))
+                //{
+                //    message.Conversation.ConversationType = "personal";
+                //}
 
                 // end to to
 
@@ -244,10 +244,10 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         private async Task OnMessageActivityInPersonalChatAsync(IMessageActivity message, ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             // TODO to remove after deploy
-            if (string.IsNullOrEmpty(message.ReplyToId))
-            {
-                message.ReplyToId = Guid.NewGuid().ToString();
-            }
+            //if (string.IsNullOrEmpty(message.ReplyToId))
+            //{
+            //    message.ReplyToId = Guid.NewGuid().ToString();
+            //}
 
             // End TODO
 
