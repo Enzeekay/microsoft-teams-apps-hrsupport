@@ -3,6 +3,8 @@
 // </copyright>
 
 using System.Collections;
+using Azure;
+using Azure.AI.Language.QuestionAnswering;
 using Microsoft.Teams.Apps.AskHR.DynamicService;
 
 namespace Microsoft.Teams.Apps.AskHR.Bots
@@ -36,11 +38,13 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
     public class AskHRBot : ActivityHandler
     {
         private readonly string expectedTenantId;
+        private readonly string deploymentName;
         private readonly TelemetryClient telemetryClient;
         private readonly IConfigurationProvider configurationProvider;
         private readonly IHelpDataProvider helpDataProvider;
         private readonly MessagingExtension messageExtension;
         private readonly IQnAMakerFactory qnaMakerFactory;
+        private readonly IQuestionAnsweringFactory questionAnsweringFactory;
         private readonly string appBaseUri;
         private readonly MicrosoftAppCredentials microsoftAppCredentials;
         private readonly ITicketsProvider ticketsProvider;
@@ -57,6 +61,7 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         /// <param name="messageExtension">Messaging extension instance</param>
         /// <param name="appBaseUri">Base URI at which the app is served</param>
         /// <param name="expectedTenantId">Tenant id</param>
+        /// <param name="deploymentName">deploymentName</param>
         /// <param name="microsoftAppCredentials">Microsoft app credentials to use</param>
         /// <param name="ticketsProvider">The tickets provider.</param>
         /// <param name="ticketService">ticket service</param>
@@ -69,10 +74,12 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             MessagingExtension messageExtension,
             string appBaseUri,
             string expectedTenantId,
+            string deploymentName,
             MicrosoftAppCredentials microsoftAppCredentials,
             ITicketsProvider ticketsProvider,
             ITicketService ticketService,
-            IUserService userService)
+            IUserService userService,
+            IQuestionAnsweringFactory questionAnsweringFactory)
         {
             this.telemetryClient = telemetryClient;
             this.configurationProvider = configurationProvider;
@@ -84,7 +91,9 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             this.ticketsProvider = ticketsProvider;
             this.ticketService = ticketService;
             this._userService = userService;
+            this.questionAnsweringFactory = questionAnsweringFactory;
             this.expectedTenantId = expectedTenantId;
+            this.deploymentName = deploymentName;
         }
 
         /// <inheritdoc/>
@@ -94,12 +103,6 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             {
                 turnContext.Activity.Conversation.TenantId = this.expectedTenantId;
             }
-
-            //var userDetail = this._userService.GetUserDetail("PSVdev@atomfrontier.com").Result;
-            //if (userDetail != null)
-            //{
-            //    this.telemetryClient.TrackTrace($"userDetail: {userDetail.JsonSerializeObject()}");
-            //}
 
             if (!this.IsActivityFromExpectedTenant(turnContext))
             {
@@ -138,10 +141,10 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
                 await this.SendTypingIndicatorAsync(turnContext);
 
                 // TODO to remove to deploy
-                //if (string.IsNullOrEmpty(message.Conversation.ConversationType))
-                //{
-                //    message.Conversation.ConversationType = "personal";
-                //}
+                if (string.IsNullOrEmpty(message.Conversation.ConversationType))
+                {
+                    message.Conversation.ConversationType = "personal";
+                }
 
                 // end to to
 
@@ -244,10 +247,10 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
         private async Task OnMessageActivityInPersonalChatAsync(IMessageActivity message, ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             // TODO to remove after deploy
-            //if (string.IsNullOrEmpty(message.ReplyToId))
-            //{
-            //    message.ReplyToId = Guid.NewGuid().ToString();
-            //}
+            if (string.IsNullOrEmpty(message.ReplyToId))
+            {
+                message.ReplyToId = Guid.NewGuid().ToString();
+            }
 
             // End TODO
 
@@ -294,11 +297,14 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             else
             {
                 this.telemetryClient.TrackTrace("Sending input to QnAMaker");
-                var queryResult = await this.GetAnswerFromQnAMakerAsync(text, turnContext, cancellationToken);
-                if (queryResult != null)
+                var answerResult = await this.GetAnswerFromQuestionAnswerAsync(text, turnContext, cancellationToken);
+
+                //var queryResult = await this.GetAnswerFromQnAMakerAsync(text, turnContext, cancellationToken);
+
+                if (answerResult != null)
                 {
                     this.telemetryClient.TrackTrace("Sending user QnAMaker card");
-                    await turnContext.SendActivityAsync(MessageFactory.Attachment(ResponseCard.GetCard(queryResult.Questions[0], queryResult.Answer, text)));
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(ResponseCard.GetCard(answerResult.Questions[0], answerResult.Answer, text)));
                 }
                 else
                 {
@@ -628,6 +634,75 @@ namespace Microsoft.Teams.Apps.AskHR.Bots
             {
                 // Per spec, treat errors getting a response from QnAMaker as if we got no results
                 this.telemetryClient.TrackTrace($"Error Matching tags with table storage, will convert to no result: {ex.Message}");
+                this.telemetryClient.TrackException(ex);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// GetQuestionAnsweringAsync
+        /// </summary>
+        /// <param name="message">message</param>
+        /// <param name="projectName">project name</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>AnswersResult</returns>
+        public async Task<AnswersResult> GetQuestionAnsweringAsync(string message, string projectName, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var client = this.questionAnsweringFactory.GetQuestionAnsweringInstance(projectName);
+                var project = new QuestionAnsweringProject(projectName, this.deploymentName);
+                var response = await client.GetAnswersAsync(message, project, cancellationToken: cancellationToken);
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        private async Task<KnowledgeBaseAnswer> GetAnswerFromQuestionAnswerAsync(string message, ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return null;
+            }
+
+            try
+            {
+                var userDetail = await this.GetUserDetailsInPersonalChatAsync(turnContext, (cancellationToken));
+
+                var userInfoModel = this._userService.GetUserDetail(userDetail.Email).Result;
+                var department = await this._userService.GetDepartment(message);
+
+                this.telemetryClient.TrackTrace($"user location: {userInfoModel?.OfficeLocation}, department: {department}");
+
+                if (string.IsNullOrEmpty(userInfoModel?.OfficeLocation))
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(UnrecognizedInputCard.GetCard(message, Resource.ConfigurationIssueMessage)));
+                    this.telemetryClient.TrackTrace("Knowledge base ID was not found in configuration table", SeverityLevel.Warning);
+                    return null;
+                }
+
+                var projectName = $"{userInfoModel?.OfficeLocation}-{department}";
+                var response = await GetQuestionAnsweringAsync(message, projectName, cancellationToken);
+
+                var answer = response?.Answers?.FirstOrDefault();
+                if (answer != null && !answer.Questions.Any())
+                {
+                    return null;
+                }
+
+                return answer;
+            }
+            catch (Exception ex)
+            {
+                await turnContext.SendActivityAsync(MessageFactory.Attachment(UnrecognizedInputCard.GetCard(message, Resource.ExceptionMessage)));
+
+                // Per spec, treat errors getting a response from QnAMaker as if we got no results
+                this.telemetryClient.TrackTrace($"Error getting answer from QnAMaker, will convert to no result: {ex.Message}");
                 this.telemetryClient.TrackException(ex);
                 return null;
             }

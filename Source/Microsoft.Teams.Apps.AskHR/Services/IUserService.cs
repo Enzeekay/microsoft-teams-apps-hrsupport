@@ -6,5 +6,6 @@ namespace Microsoft.Teams.Apps.AskHR.Services
     public interface IUserService
     {
         Task<UserInfoModel> GetUserDetail(string email);
+        Task<string> GetDepartment(string question);
     }
 }

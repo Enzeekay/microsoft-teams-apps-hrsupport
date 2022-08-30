@@ -20,10 +20,6 @@ namespace Microsoft.Teams.Apps.AskHR.DynamicService
 
         public async Task<List<TicketModel>> GetMyTicketAsync(string username)
         {
-            if (string.IsNullOrEmpty(username))
-            {
-                username = "PSVdev@atomfrontier.com";
-            }
             var baseUrl = $"{_setting.EndPoint}/ticket/request/paths/invoke?mail={username}";
             var header = new Dictionary<string, string> { { "Client_secret", _setting.ClientSecret } };
             var getUserInfo = await HttpClientHelper<List<TicketModel>>.GetAsync(baseUrl, header);

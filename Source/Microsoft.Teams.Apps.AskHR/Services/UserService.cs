@@ -23,5 +23,13 @@ namespace Microsoft.Teams.Apps.AskHR.Services
             var getUserInfo = await HttpClientHelper<UserInfoModel>.GetAsync(baseUrl, header);
             return getUserInfo;
         }
+
+        public async Task<string> GetDepartment(string question)
+        {
+            var baseUrl = $"{_setting.EndPoint}/classification/request/paths/invoke/question?question={question}";
+            var header = new Dictionary<string, string> { { "Client_secret", _setting.ClientSecret } };
+            var getUserInfo = await HttpClientHelper<string>.GetRawValue(baseUrl, header);
+            return getUserInfo;
+        }
     }
 }

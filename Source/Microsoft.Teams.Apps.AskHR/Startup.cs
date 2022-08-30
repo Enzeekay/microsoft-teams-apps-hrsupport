@@ -74,12 +74,15 @@ namespace Microsoft.Teams.Apps.AskHR
                 provider.GetRequiredService<MessagingExtension>(),
                 this.Configuration["AppBaseUri"],
                 this.Configuration["TenantId"],
+                this.Configuration["QuestionAnsweringDeploymentName"],
                 provider.GetRequiredService<MicrosoftAppCredentials>(),
                 provider.GetRequiredService<ITicketsProvider>(),
                 provider.GetRequiredService<ITicketService>(),
-                provider.GetRequiredService<IUserService>()));
+                provider.GetRequiredService<IUserService>(),
+                provider.GetRequiredService<IQuestionAnsweringFactory>()));
             services.AddApplicationInsightsTelemetry();
             services.AddSingleton<IQnAMakerFactory, QnAMakerFactory>();
+            services.AddSingleton<IQuestionAnsweringFactory, QuestionAnsweringFactory>();
             services.AddSingleton<ISearchService, SearchService>();
             services.AddSingleton<MessagingExtension>();
             services.AddMemoryCache();

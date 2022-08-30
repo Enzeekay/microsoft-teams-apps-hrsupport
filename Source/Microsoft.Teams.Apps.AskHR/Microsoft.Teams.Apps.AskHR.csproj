@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <PackageReference Include="AdaptiveCards" Version="1.0.6" />
+    <PackageReference Include="Azure.AI.Language.QuestionAnswering" Version="1.0.0" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.10.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -60,7 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="appsettings.json">
+    <Content Update=",.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

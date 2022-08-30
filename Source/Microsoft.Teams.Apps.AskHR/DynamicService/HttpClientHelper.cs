@@ -44,5 +44,26 @@ namespace Microsoft.Teams.Apps.AskHR.DynamicService
 
             return result;
         }
+
+        public static async Task<T> GetRawValue(string url, Dictionary<string, string> headers = null)
+        {
+            T result = null;
+            using (var client = new HttpClient())
+            {
+                if (headers != null)
+                {
+                    foreach (KeyValuePair<string, string> header in headers)
+                    {
+                        client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                    }
+                }
+
+                var res = await client.GetAsync(url);
+                var content = await res.Content.ReadAsStringAsync();
+                result = content as T;
+            }
+
+            return result;
+        }
     }
 }
