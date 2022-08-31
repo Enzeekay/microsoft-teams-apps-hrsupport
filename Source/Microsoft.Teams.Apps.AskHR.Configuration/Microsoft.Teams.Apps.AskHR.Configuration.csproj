@@ -322,7 +322,7 @@
     <Content Include="Images\HelpImg7.jpg" />
     <Content Include="Images\HelpImg8.jpg" />
     <Content Include="Images\HelpImg9.jpg" />
-    //<Content Include="libman.json" />
+    /*<Content Include="libman.json" />*/
     <Content Include="lib\jquery-ajax-unobtrusive\dist\jquery.unobtrusive-ajax.js" />
     <Content Include="lib\jquery-ajax-unobtrusive\dist\jquery.unobtrusive-ajax.min.js" />
     <Content Include="lib\jquery-ajax-unobtrusive\LICENSE.txt" />
